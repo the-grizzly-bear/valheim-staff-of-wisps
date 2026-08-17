@@ -1,4 +1,5 @@
 using BepInEx;
+using HarmonyLib;
 using Jotunn.Configs;
 using Jotunn.Entities;
 using Jotunn.Managers;
@@ -12,13 +13,30 @@ namespace StaffOfWisps
     {
         public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "1.1.0";
+        public const string PluginVersion = "1.2.0";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
+        private static readonly float[] StayTtlByQuality = { 25f, 35f, 45f, 60f };
 
         private void Awake()
         {
+            new Harmony(PluginGUID).PatchAll();
             PrefabManager.OnVanillaPrefabsAvailable += AddStaffOfWisps;
+        }
+
+        [HarmonyPatch(typeof(Projectile), nameof(Projectile.Setup))]
+        private static class ScaleStayTtlWithQuality
+        {
+            private static void Postfix(Projectile __instance, ItemDrop.ItemData item)
+            {
+                if (item?.m_dropPrefab == null || item.m_dropPrefab.name != "StaffWisp")
+                {
+                    return;
+                }
+
+                int index = Mathf.Clamp(item.m_quality - 1, 0, StayTtlByQuality.Length - 1);
+                __instance.m_stayTTL = StayTtlByQuality[index];
+            }
         }
 
         private void AddStaffOfWisps()

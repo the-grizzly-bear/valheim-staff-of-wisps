@@ -25,6 +25,8 @@ so you can lob it ahead to light up the path through the Mistlands fog.
 ## Recipe
 
 Crafted at a Galdr table: Yggdrasil wood x20, Wisp x4, Refined eitr x16.
+Upgradeable to quality 4 like other staves; higher quality makes the landed
+wisp linger longer (25s / 35s / 45s / 60s for quality 1-4).
 
 ## Build from source
 
