@@ -1,7 +1,7 @@
 # Staff of Wisps
 
 A Valheim mod (BepInEx/Jotunn) that adds the Staff of Wisps: a Mistlands-tier
-staff that throws a bound wisp instead of a fireball. Deals spirit damage
+staff that throws a bound wisp. Deals spirit damage
 instead of fire, arcs like a thrown projectile, and the wisp lingers and
 glows where it lands - clears mist around it as it flies and after landing,
 so you can lob it ahead to light up the path through the Mistlands fog.
