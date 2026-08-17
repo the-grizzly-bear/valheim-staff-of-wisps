@@ -10,9 +10,9 @@ namespace StaffOfWisps
     [BepInDependency("com.jotunn.jotunn")]
     public class StaffOfWispsPlugin : BaseUnityPlugin
     {
-        public const string PluginGUID = "wasabi.valheim.staffofwisps";
+        public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "1.0.0";
+        public const string PluginVersion = "1.1.0";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
 
@@ -35,7 +35,7 @@ namespace StaffOfWisps
                 Name = "Recipe_StaffWisp",
                 Item = "StaffWisp",
                 Amount = 1,
-                CraftingStation = "blackforge",
+                CraftingStation = "piece_magetable",
                 Requirements = new[]
                 {
                     new RequirementConfig { Item = "YggdrasilWood", Amount = 20, AmountPerLevel = 10 },

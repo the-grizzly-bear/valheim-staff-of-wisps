@@ -24,7 +24,7 @@ so you can lob it ahead to light up the path through the Mistlands fog.
 
 ## Recipe
 
-Crafted at a Black Forge: Yggdrasil wood x20, Wisp x4, Refined eitr x16.
+Crafted at a Galdr table: Yggdrasil wood x20, Wisp x4, Refined eitr x16.
 
 ## Build from source
 
