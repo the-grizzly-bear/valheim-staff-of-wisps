@@ -16,7 +16,11 @@ so you can lob it ahead to light up the path through the Mistlands fog.
 1. Install BepInEx and Jotunn as normal Valheim plugins.
 2. Drop `StaffOfWisps.dll` into `BepInEx/plugins/StaffOfWisps/`.
 3. Needs to be installed on both client and server (or all players in a
-   non-dedicated game) since it registers a new item/prefab.
+   non-dedicated game). This registers a brand-new prefab (item + projectile)
+   that doesn't exist in vanilla, so a client without the mod has no way to
+   resolve its hash when a ZDO references it - different from mods that just
+   reroll/modify existing spawns, where ZDO ownership means a single
+   unmodded client can degrade more gracefully.
 
 ## Recipe
 
