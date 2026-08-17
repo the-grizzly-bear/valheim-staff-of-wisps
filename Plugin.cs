@@ -13,10 +13,11 @@ namespace StaffOfWisps
     {
         public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "1.2.0";
+        public const string PluginVersion = "1.3.0";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
         private static readonly float[] StayTtlByQuality = { 25f, 35f, 45f, 60f };
+        private static readonly float[] MistRadiusMultiplierByQuality = { 1f, 1.25f, 1.5f, 2f };
 
         private void Awake()
         {
@@ -36,6 +37,12 @@ namespace StaffOfWisps
 
                 int index = Mathf.Clamp(item.m_quality - 1, 0, StayTtlByQuality.Length - 1);
                 __instance.m_stayTTL = StayTtlByQuality[index];
+
+                ParticleSystemForceField forceField = __instance.GetComponentInChildren<ParticleSystemForceField>();
+                if (forceField != null)
+                {
+                    forceField.endRange *= MistRadiusMultiplierByQuality[index];
+                }
             }
         }
 
