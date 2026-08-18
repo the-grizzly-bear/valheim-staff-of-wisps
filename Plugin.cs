@@ -13,7 +13,7 @@ namespace StaffOfWisps
     {
         public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "1.3.0";
+        public const string PluginVersion = "1.5.0";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
         private static readonly float[] StayTtlByQuality = { 25f, 35f, 45f, 60f };
@@ -78,6 +78,12 @@ namespace StaffOfWisps
             ReplaceFireLookWithWisp(projectile.transform);
             AttachDemisterOrb(projectile.transform, Vector3.zero, 0.5f, keepMistClearing: true);
 
+            ZNetView netView = projectile.GetComponent<ZNetView>();
+            if (netView != null)
+            {
+                netView.m_distant = true;
+            }
+
             Projectile proj = projectile.GetComponent<Projectile>();
             if (proj != null)
             {
@@ -137,10 +143,7 @@ namespace StaffOfWisps
                 Object.DestroyImmediate(lodGroup);
             }
 
-            Sprite icon = Jotunn.Managers.RenderManager.Instance.Render(new Jotunn.Managers.RenderManager.RenderRequest(item)
-            {
-                Rotation = Jotunn.Managers.RenderManager.IsometricRotation
-            });
+            Sprite icon = Jotunn.Managers.RenderManager.Instance.Render(item);
             if (icon != null)
             {
                 itemDrop.m_itemData.m_shared.m_icons = new[] { icon };
