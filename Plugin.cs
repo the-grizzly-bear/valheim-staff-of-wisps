@@ -13,7 +13,7 @@ namespace StaffOfWisps
     {
         public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "1.5.0";
+        public const string PluginVersion = "1.6.0";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
         private static readonly float[] StayTtlByQuality = { 25f, 35f, 45f, 60f };
@@ -246,7 +246,18 @@ namespace StaffOfWisps
                 Object.DestroyImmediate(netView);
             }
 
-            if (!keepMistClearing)
+            if (keepMistClearing)
+            {
+                foreach (ParticleSystemForceField field in orb.GetComponentsInChildren<ParticleSystemForceField>(true))
+                {
+                    ParticleSystem.MinMaxCurve gravity = field.gravity;
+                    gravity.constant *= 4f;
+                    gravity.constantMin *= 4f;
+                    gravity.constantMax *= 4f;
+                    field.gravity = gravity;
+                }
+            }
+            else
             {
                 foreach (Demister demister in orb.GetComponentsInChildren<Demister>(true))
                 {
