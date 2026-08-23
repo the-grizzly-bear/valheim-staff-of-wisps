@@ -2,9 +2,10 @@
 
 A Valheim mod (BepInEx/Jotunn) that adds the Staff of Wisps: a Mistlands-tier
 staff that throws a bound wisp instead of a fireball. Deals spirit damage
-instead of fire, arcs like a thrown projectile, and the wisp lingers and
-glows where it lands - clears mist around it as it flies and after landing,
-so you can lob it ahead to light up the path through the Mistlands fog.
+instead of fire, arcs like a thrown projectile, clears mist as it flies, and
+on impact spawns a lingering glowing wisp that keeps clearing mist around
+itself for a while - so you can lob it ahead to light up the path through
+the Mistlands fog.
 
 ## Requirements
 
@@ -16,11 +17,14 @@ so you can lob it ahead to light up the path through the Mistlands fog.
 1. Install BepInEx and Jotunn as normal Valheim plugins.
 2. Drop `StaffOfWisps.dll` into `BepInEx/plugins/StaffOfWisps/`.
 3. Needs to be installed on both client and server (or all players in a
-   non-dedicated game). This registers a brand-new prefab (item + projectile)
-   that doesn't exist in vanilla, so a client without the mod has no way to
-   resolve its hash when a ZDO references it - different from mods that just
-   reroll/modify existing spawns, where ZDO ownership means a single
-   unmodded client can degrade more gracefully.
+   non-dedicated game). This registers brand-new prefabs (item, projectile,
+   and the landed-wisp piece it spawns on impact) that don't exist in
+   vanilla, so a client without the mod has no way to resolve their hash
+   when a ZDO references them - different from mods that just reroll/modify
+   existing spawns, where ZDO ownership means a single unmodded client can
+   degrade more gracefully. Whichever player's client throws the staff is
+   also the one whose version determines that particular throw's behavior,
+   so keep both client and server updated together, not just one side.
 
 ## Recipe
 

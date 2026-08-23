@@ -13,11 +13,12 @@ namespace StaffOfWisps
     {
         public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "1.6.0";
+        public const string PluginVersion = "2.0.0";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
         private static readonly float[] StayTtlByQuality = { 25f, 35f, 45f, 60f };
         private static readonly float[] MistRadiusMultiplierByQuality = { 1f, 1.25f, 1.5f, 2f };
+        private static GameObject[] landedWispByQuality;
 
         private void Awake()
         {
@@ -25,8 +26,10 @@ namespace StaffOfWisps
             PrefabManager.OnVanillaPrefabsAvailable += AddStaffOfWisps;
         }
 
+        // Picks which landed-wisp piece this throw spawns on impact, and how strongly the
+        // in-flight orb's own mist-repulsion scales, based on the staff's quality level.
         [HarmonyPatch(typeof(Projectile), nameof(Projectile.Setup))]
-        private static class ScaleStayTtlWithQuality
+        private static class ScaleWithQuality
         {
             private static void Postfix(Projectile __instance, ItemDrop.ItemData item)
             {
@@ -36,7 +39,7 @@ namespace StaffOfWisps
                 }
 
                 int index = Mathf.Clamp(item.m_quality - 1, 0, StayTtlByQuality.Length - 1);
-                __instance.m_stayTTL = StayTtlByQuality[index];
+                __instance.m_spawnOnHit = landedWispByQuality[index];
 
                 ParticleSystemForceField forceField = __instance.GetComponentInChildren<ParticleSystemForceField>();
                 if (forceField != null)
@@ -46,10 +49,33 @@ namespace StaffOfWisps
             }
         }
 
+        private class DestroyAfterSeconds : MonoBehaviour
+        {
+            public float delay = 25f;
+
+            private void Start()
+            {
+                Invoke(nameof(DoDestroy), delay);
+            }
+
+            private void DoDestroy()
+            {
+                if (ZNetScene.instance != null)
+                {
+                    ZNetScene.instance.Destroy(gameObject);
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
+            }
+        }
+
         private void AddStaffOfWisps()
         {
             PrefabManager.OnVanillaPrefabsAvailable -= AddStaffOfWisps;
 
+            landedWispByQuality = BuildLandedWispVariants();
             GameObject projectile = BuildWispProjectile();
             GameObject item = BuildWispStaff(projectile);
 
@@ -70,6 +96,53 @@ namespace StaffOfWisps
             }));
         }
 
+        // Clones the real Wisp Torch piece (a placed structure, so it gets proper wide
+        // network relevancy - unlike a thrown projectile, which is why the old "stay after
+        // hit" approach didn't reliably show for other players) for each quality level,
+        // stripped of its stand/base and any build-placement components, since this is
+        // spawned at an impact point rather than actually placed by a player.
+        private static GameObject[] BuildLandedWispVariants()
+        {
+            GameObject[] variants = new GameObject[StayTtlByQuality.Length];
+            for (int i = 0; i < variants.Length; i++)
+            {
+                GameObject clone = PrefabManager.Instance.CreateClonedPrefab(
+                    "staff_wisp_landed_q" + (i + 1), "piece_groundtorch_mist");
+
+                Transform torchModel = clone.transform.Find("TorchModel");
+                if (torchModel != null)
+                {
+                    Object.DestroyImmediate(torchModel.gameObject);
+                }
+                Transform playerBase = clone.transform.Find("PlayerBase");
+                if (playerBase != null)
+                {
+                    Object.DestroyImmediate(playerBase.gameObject);
+                }
+
+                foreach (Piece piece in clone.GetComponentsInChildren<Piece>(true))
+                {
+                    Object.DestroyImmediate(piece);
+                }
+                foreach (WearNTear wearNTear in clone.GetComponentsInChildren<WearNTear>(true))
+                {
+                    Object.DestroyImmediate(wearNTear);
+                }
+
+                ParticleSystemForceField forceField = clone.GetComponentInChildren<ParticleSystemForceField>(true);
+                if (forceField != null)
+                {
+                    forceField.endRange *= MistRadiusMultiplierByQuality[i];
+                }
+
+                DestroyAfterSeconds destroyer = clone.AddComponent<DestroyAfterSeconds>();
+                destroyer.delay = StayTtlByQuality[i];
+
+                variants[i] = clone;
+            }
+            return variants;
+        }
+
         private GameObject BuildWispProjectile()
         {
             GameObject projectile = PrefabManager.Instance.CreateClonedPrefab(
@@ -88,10 +161,8 @@ namespace StaffOfWisps
             if (proj != null)
             {
                 proj.m_gravity = 3.5f;
-                proj.m_stayAfterHitStatic = true;
-                proj.m_stayAfterHitDynamic = true;
-                proj.m_stayTTL = 25f;
                 proj.m_ttl = 30f;
+                proj.m_spawnOnHit = landedWispByQuality[0];
 
                 if (proj.m_hitEffects.m_effectPrefabs != null)
                 {
