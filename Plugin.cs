@@ -13,7 +13,7 @@ namespace StaffOfWisps
     {
         public const string PluginGUID = "mishka.valheim.staffofwisps";
         public const string PluginName = "StaffOfWisps";
-        public const string PluginVersion = "2.0.0";
+        public const string PluginVersion = "2.0.1";
 
         private static readonly Color WispColor = new Color(0.55f, 0.85f, 1f);
         private static readonly float[] StayTtlByQuality = { 25f, 35f, 45f, 60f };
